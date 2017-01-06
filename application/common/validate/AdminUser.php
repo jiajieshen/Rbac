@@ -14,7 +14,13 @@ use think\Validate;
 class AdminUser extends Validate
 {
     protected $rule = [
-        'account'  => 'require|alphaNum|length:3,32',
-        'password' => 'require|length:6,32'
+        'account'    => 'require|alphaDash|length:3,32',
+        'password'   => 'require|length:32',
+        'repassword' => 'require|confirm:password',
+        'name'       => 'require',
+    ];
+
+    protected $message = [
+        'repassword' => '两次填写的密码不一致'
     ];
 }

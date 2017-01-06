@@ -11,10 +11,18 @@ namespace app\common\controller;
 
 use think\Config;
 use think\Controller;
-use think\Request;
 
 class BaseController extends Controller
 {
+
+    protected function _initialize()
+    {
+        parent::_initialize();
+
+        // 统一参数过滤
+        $this->request->filter(['htmlspecialchars', 'trim']);
+    }
+
     /**
      * 判断非 ajax 和非 post 请求
      * @return bool
