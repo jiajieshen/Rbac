@@ -10,3 +10,12 @@
 // +----------------------------------------------------------------------
 
 // 应用公共文件
+/**
+ * 统一密码加密方式，如需变动直接修改此处
+ * @param $password
+ * @return string
+ */
+function hash_md5_password($password)
+{
+    return hash("md5", trim($password));
+}
