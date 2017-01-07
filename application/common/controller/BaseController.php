@@ -24,7 +24,16 @@ class BaseController extends Controller
     }
 
     /**
-     * 判断非 ajax 和非 post 请求
+     * 判断是否为 ajax 或者 post 请求
+     * @return bool
+     */
+    public function isAjaxOrPost()
+    {
+        return $this->request->isAjax() || $this->request->isPost();
+    }
+
+    /**
+     * 判断是否为非 ajax 和非 post 请求
      * @return bool
      */
     public function isNotAjaxAndPost()

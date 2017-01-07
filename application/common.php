@@ -19,3 +19,22 @@ function hash_md5_password($password)
 {
     return hash("md5", trim($password));
 }
+
+/**
+ * 生成随机字符串
+ *
+ * @param integer $length 字符串长度
+ *
+ * @return string
+ */
+function randString($length)
+{
+    $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+    $result = '';
+    $max = strlen($chars) - 1;
+    for ($i = 0; $i < $length; $i++) {
+        $result .= $chars[rand(0, $max)];
+    }
+    return $result;
+}

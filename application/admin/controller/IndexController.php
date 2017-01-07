@@ -9,7 +9,9 @@
 namespace app\admin\controller;
 
 
-class IndexController
+use app\common\controller\AuthController;
+
+class IndexController extends AuthController
 {
     public function index()
     {
