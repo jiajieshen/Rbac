@@ -4,13 +4,25 @@
     <meta charset="UTF-8">
     <title>Rbac</title>
 
-    <script src="/static/js/vue.js"></script>
+    <!-- 引入 element-ui 样式 -->
+    <link rel="stylesheet" href="/static/vendor/node_modules/element-ui/lib/theme-default/index.css">
 </head>
 <body>
-
-<script>
-
-
-</script>
+<div id="app">
+    <el-button @click="visible = true">按钮</el-button>
+    <el-dialog v-model="visible" title="Hello world">
+        <p>欢迎使用 Element</p>
+    </el-dialog>
+</div>
 </body>
+<script src="/static/vendor/node_modules/vue/dist/vue.js"></script>
+<script src="/static/vendor/node_modules/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data: function(){
+            return { visible: false }
+        }
+    });
+</script>
 </html>
