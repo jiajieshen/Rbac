@@ -5,25 +5,16 @@ use app\common\controller\BaseController;
 use app\common\model\AdminUser;
 use app\common\constants\SessionKey;
 use think\Db;
+use think\Session;
 
 
 class IndexController extends BaseController
 {
-
-    public function index()
-    {
-        return $this->fetch();
-    }
-
     /**
      * 注册
      */
     public function signUp()
     {
-        if ($this->isNotAjaxAndPost()) {
-            return $this->fetch();
-        }
-
         $param = $this->request->param();
         $param['password'] = hash_md5_password($param['password']);
         $param['repassword'] = hash_md5_password($param['repassword']);
@@ -36,7 +27,7 @@ class IndexController extends BaseController
 
         // 匹配账号
         $where['account'] = $param['account'];
-        if (AdminUser::where($where)->find()) {
+        if (Db::name('admin_user')->where($where)->find()) {
             $this->error('账号已存在');
         }
 
@@ -45,7 +36,7 @@ class IndexController extends BaseController
         $user = new AdminUser($param);
         $result = $user->allowField(true)->save();
         if ($result) {
-            $this->success('注册成功', 'login');
+            $this->success('注册成功');
         } else {
             $this->error('注册失败：' . $user->getError());
         }
@@ -54,12 +45,8 @@ class IndexController extends BaseController
     /**
      * 登录
      */
-    public function login()
+    public function signIn()
     {
-        if ($this->isNotAjaxAndPost()) {
-            return $this->fetch();
-        }
-
         // 参数处理
         $param = $this->request->param();
         $param['password'] = hash_md5_password($param['password']);
@@ -74,16 +61,16 @@ class IndexController extends BaseController
             if ($user['password'] != $param['password']) {
                 $this->error('密码不正确');
             } else {
-                // 处理登录成功，包括判断角色，跳转页面
+                // 处理登录成功事件，保存相关信息
                 $this->handleLoginSuccess($user);
             }
         }
     }
 
     /**
-     * 处理登录成功的信息，包括判断角色，跳转页面
+     * 处理登录成功事件，保存相关信息
      *
-     * @param array $user 用户表信息
+     * @param array $user 用户
      */
     private function handleLoginSuccess($user)
     {
@@ -93,7 +80,7 @@ class IndexController extends BaseController
         $update['last_login_ip'] = $this->request->ip();
         $result = Db::name('admin_user')->where('id', $user['id'])->update($update);
         if (!$result) {
-            $this->error('登录失败，请重试！');
+            $this->error('登录失败，请重试');
         }
 
         // 保存用户 session
@@ -102,14 +89,23 @@ class IndexController extends BaseController
         session(SessionKey::LAST_LOGIN_TIME, $user['last_login_time']);
         session(SessionKey::LAST_LOGIN_IP, $user['last_login_ip']);
 
-        // 根据是否为后台管理员跳转
+        //  保存是否为后台管理员
         if ($user['id'] == 1) {
             session(SessionKey::IS_ADMIN, true);
-            $this->success('登录成功', 'admin/index/index');
         } else {
             session(SessionKey::IS_ADMIN, false);
-            $this->success('登录成功', 'user/index/index');
         }
+
+        $this->success('登录成功');
+    }
+
+    /**
+     * 退出登录
+     */
+    public function signOut()
+    {
+        Session::clear();
+        $this->success('退出登录');
     }
 
 }

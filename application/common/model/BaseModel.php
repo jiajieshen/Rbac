@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: sum
- * Date: 1/6/17
- * Time: 1:07 PM
+ * Date: 1/13/17
+ * Time: 11:21 PM
  */
 
 namespace app\common\model;
@@ -11,7 +11,7 @@ namespace app\common\model;
 
 use think\Model;
 
-class AdminUser extends Model
+class BaseModel extends Model
 {
 
 

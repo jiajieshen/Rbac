@@ -23,4 +23,5 @@ class AdminUser extends Validate
     protected $message = [
         'repassword' => '两次填写的密码不一致'
     ];
+
 }

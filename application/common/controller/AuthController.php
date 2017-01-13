@@ -40,23 +40,11 @@ class AuthController extends BaseController
         defined('IS_ADMIN') or define('IS_ADMIN', session(SessionKey::IS_ADMIN));
 
         if (UID === null) {
-            $this->backToLogin();
+            $this->error("登录超时，请重新登录");
         } else {
             if (!$this->checkAccess()) {
                 $this->error('缺少访问授权');
             }
-        }
-    }
-
-    /**
-     * 返回登录页
-     */
-    private function backToLogin()
-    {
-        if ($this->isAjaxOrPost()) {
-            $this->error("登录超时，请重新登录！", url('index/index/login'));
-        } else {
-            $this->redirect('index/index/login');
         }
     }
 
@@ -102,14 +90,6 @@ class AuthController extends BaseController
         return false;
     }
 
-    /**
-     * 退出登录
-     */
-    public function logout()
-    {
-        Session::clear();
-        $this->success('退出登录', 'index/index/index');
-    }
 
 
 }
