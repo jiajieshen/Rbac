@@ -8,9 +8,8 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 
 import App from './App'
-import Home from './components/Home'
 import SignIn from './components/SignIn'
-import Hello from './components/Hello'
+import Main from './components/Main'
 
 Vue.use(VueRouter)
 Vue.use(VueResource)
@@ -18,16 +17,18 @@ Vue.use(ElementUI)
 
 const routes = [{
   path: '/',
-  component: Home
-}, {
-  path: '/signIn',
-  component: SignIn
-}, {
-  path: '/home',
-  component: Home
-}, {
-  path: '/hello',
-  component: Hello
+  component: App,
+  children: [{
+    path: '/',
+    component: Main
+  }, {
+    path: '/signIn',
+    component: SignIn
+  }, {
+    path: '/main',
+    component: Main
+  }
+  ]
 }]
 
 const router = new VueRouter({
