@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2016 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -23,6 +23,7 @@ use think\exception\HttpResponseException;
 use think\Lang;
 use think\Loader;
 use think\Log;
+use think\Model;
 use think\Request;
 use think\Response;
 use think\Session;
@@ -329,7 +330,7 @@ if (!function_exists('cookie')) {
             Cookie::clear($value);
         } elseif ('' === $value) {
             // 获取
-            return 0 === strpos($name, '?') ? Cookie::has(substr($name, 1), $option) : Cookie::get($name);
+            return 0 === strpos($name, '?') ? Cookie::has(substr($name, 1), $option) : Cookie::get($name, $option);
         } elseif (is_null($value)) {
             // 删除
             return Cookie::delete($name);
@@ -546,5 +547,39 @@ if (!function_exists('token')) {
     {
         $token = Request::instance()->token($name, $type);
         return '<input type="hidden" name="' . $name . '" value="' . $token . '" />';
+    }
+}
+
+if (!function_exists('load_relation')) {
+    /**
+     * 延迟预载入关联查询
+     * @param mixed $resultSet 数据集
+     * @param mixed $relation 关联
+     * @return array
+     */
+    function load_relation($resultSet, $relation)
+    {
+        $item = current($resultSet);
+        if ($item instanceof Model) {
+            $item->eagerlyResultSet($resultSet, $relation);
+        }
+        return $resultSet;
+    }
+}
+
+if (!function_exists('collection')) {
+    /**
+     * 数组转换为数据集对象
+     * @param array $resultSet 数据集数组
+     * @return \think\model\Collection|\think\Collection
+     */
+    function collection($resultSet)
+    {
+        $item = current($resultSet);
+        if ($item instanceof Model) {
+            return \think\model\Collection::make($resultSet);
+        } else {
+            return \think\Collection::make($resultSet);
+        }
     }
 }
