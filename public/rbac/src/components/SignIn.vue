@@ -9,6 +9,7 @@
         </div>
     </div>
 </template>
+
 <script type="es6">
     export default{
         data(){
@@ -27,6 +28,7 @@
         }
     }
 </script>
+
 <style>
     .layer-signin {
         background-color: #ff0000;
