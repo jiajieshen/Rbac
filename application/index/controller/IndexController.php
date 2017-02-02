@@ -15,26 +15,26 @@ class IndexController extends BaseController
      */
     public function signUp()
     {
-        $param = $this->request->param();
+        $param = $this->request->only(['account', 'password', 'repassword', 'name']);
         $param['password'] = hash_md5_password($param['password']);
         $param['repassword'] = hash_md5_password($param['repassword']);
 
         //验证字段
-        $validate = validate('admin_user');
+        $validate = validate('AdminUser');
         if (!$validate->check($param)) {
             $this->error($validate->getError());
         }
 
         // 匹配账号
         $where['account'] = $param['account'];
-        if (Db::name('admin_user')->where($where)->find()) {
+        if (Db::name('AdminUser')->where($where)->find()) {
             $this->error('账号已存在');
         }
 
         // 保存
         unset($param['repassword']);
         $user = new AdminUser($param);
-        $result = $user->allowField(true)->save();
+        $result = $user->save();
         if ($result) {
             $this->success('注册成功');
         } else {
