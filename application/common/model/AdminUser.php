@@ -13,5 +13,4 @@ class AdminUser extends BaseModel
 {
 
 
-
 }

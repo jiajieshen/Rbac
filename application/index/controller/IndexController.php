@@ -20,19 +20,20 @@ class IndexController extends BaseController
         $param['repassword'] = hash_md5_password($param['repassword']);
 
         //验证字段
-        $validate = validate('AdminUser');
+        $validate = validate('admin_user');
         if (!$validate->check($param)) {
             $this->error($validate->getError());
         }
 
         // 匹配账号
         $where['account'] = $param['account'];
-        if (Db::name('AdminUser')->where($where)->find()) {
+        if (Db::name('admin_user')->where($where)->find()) {
             $this->error('账号已存在');
         }
 
         // 保存
         unset($param['repassword']);
+        $param['create_time'] = $this->request->time();
         $user = new AdminUser($param);
         $result = $user->save();
         if ($result) {
@@ -75,7 +76,6 @@ class IndexController extends BaseController
     private function handleLoginSuccess($user)
     {
         // 保存登录信息
-        $update['token'] = randString(16);
         $update['last_login_time'] = time();
         $update['last_login_ip'] = $this->request->ip();
         $result = Db::name('admin_user')->where('id', $user['id'])->update($update);

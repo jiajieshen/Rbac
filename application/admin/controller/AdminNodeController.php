@@ -9,20 +9,20 @@
 namespace app\admin\controller;
 
 
-use app\common\controller\AuthController;
+use app\common\controller\AdminController;
 use app\common\model\AdminNode;
 
-class AdminNodeController extends AuthController
+class AdminNodeController extends AdminController
 {
-
     /**
      * 获取菜单
      */
-    public function getAdminMenus()
+    public function menu()
     {
         $adminNode = new AdminNode();
-        $menus = $adminNode->getMenus(UID, 'admin');
+        $menus = $adminNode->getMenus($this->uid, $this->isAdmin);
         $this->success('success', '', $menus);
     }
+
 
 }

@@ -16,6 +16,9 @@ use think\Session;
 
 class AuthController extends BaseController
 {
+    protected $uid;
+    protected $isAdmin;
+
     /**
      * @var array 不需要被检测权限的方法列表
      */
@@ -25,21 +28,10 @@ class AuthController extends BaseController
     {
         parent::_initialize();
 
-        // for debug
-        $userToken = $this->request->param('user_token');
-        if ($userToken) {
-            $user = Db::name('admin_user')->where(['token' => $userToken])->find();
-            if ($user) {
-                define(UID, $user['id']);
-            }
-        }
+        $this->uid = session(SessionKey::UID);
+        $this->isAdmin = session(SessionKey::IS_ADMIN);
 
-        // 用户
-        defined('UID') or define('UID', session(SessionKey::UID));
-        // 是否超级管理员
-        defined('IS_ADMIN') or define('IS_ADMIN', session(SessionKey::IS_ADMIN));
-
-        if (UID === null) {
+        if ($this->uid === null) {
             $this->error("登录超时，请重新登录");
         } else {
             if (!$this->checkAccess()) {
@@ -54,6 +46,12 @@ class AuthController extends BaseController
      */
     private function checkAccess()
     {
+        // 超级管理员不需要检测
+        if ($this->isAdmin) {
+            // ignore 无需检测
+            return true;
+        }
+
         $module = $this->request->module();
         $controller = $this->request->controller();
         $action = $this->request->action();
@@ -64,26 +62,20 @@ class AuthController extends BaseController
             return true;
         }
 
-        // 超级管理员不需要检测
-        if (Session::get(SessionKey::IS_ADMIN)) {
-            // ignore 无需检测
-            return true;
-        }
-
         // 获取授权节点列表
         $accessNodeList = session(SessionKey::ACCESS_NODE_LIST);
         if (!$accessNodeList) {
             $nodeModel = new AdminNode();
-            $accessNodeList = $nodeModel->getAccessNodeList(UID);
+            $accessNodeList = $nodeModel->getAccessNodeList($this->uid);
             // TODO : session 缓存 $accessNodeList
 //            session(SessionKey::$PERMISSION_NODE_LIST, $accessNodeList);
         }
 
-        // 构造 module/controller/action 的 node key
-        $key = $module . DS . $controller . DS . $action;
+        // 构造 module/controller/action 的 node target action
+        $target = $module . DS . $controller . DS . $action;
         // 匹配权限列表
         foreach ($accessNodeList as $node) {
-            if ($node['action'] == $key) {
+            if ($node['action'] == $target) {
                 return true;
             }
         }
