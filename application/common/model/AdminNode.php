@@ -25,7 +25,7 @@ class AdminNode extends BaseModel
         $list = null;
         if ($isAdmin) {
             $list = Db::name('admin_node')
-                ->field(['id', 'pid', 'level', 'action', 'name', 'icon'])
+                ->field(['id', 'pid', 'level', 'action', 'name', 'icon','remark'])
                 ->where([
                     'status' => 1,
                     'is_menu' => 1,
@@ -41,7 +41,7 @@ class AdminNode extends BaseModel
                 ->join($prefix . 'admin_role role', 'role.id = role_user.role_id')
                 ->join($prefix . 'admin_access access', 'access.role_id = role.id')
                 ->join($prefix . 'admin_node node', 'node.id = access.node_id')
-                ->field(['node.id', 'node.pid', 'node.level', 'node.action', 'node.name', 'node.icon'])
+                ->field(['node.id', 'node.pid', 'node.level', 'node.action', 'node.name', 'node.icon','node.remark'])
                 ->distinct('node.id')
                 ->where([
                     'user.id' => $uid,
