@@ -8,6 +8,45 @@ use think\Loader;
 trait Curd
 {
     /**
+     * 获取首页列表数据
+     * PS：可以在 before index 方法中动态设置查询参数 $this->indexConfig
+     */
+    public function index()
+    {
+        $config = [
+            'isPage' => true,
+            'page' => $this->request->param('page/d', 1),
+            'page_size' => $this->request->param('page_size/d', 15),
+            'where' => null,
+            'field' => true,
+            'order' => null
+        ];
+
+        if (isset($this->indexConfig)) {
+            $config = array_merge($config, $this->indexConfig);
+        }
+
+        $model = $this->getModel();
+        if ($config['isPage']) {
+            $list = $model->field($config['field'])
+                ->where($config['where'])
+                ->order($config['order'])
+                ->page($config['page'], $config['page_size'])
+                ->select();
+            $data['page'] = $config['page'];
+            $data['page_size'] = $config['page_size'];
+            $data['list'] = $list;
+        } else {
+            $data = $model->field($config['field'])
+                ->where($config['where'])
+                ->order($config['order'])
+                ->select();
+        }
+
+        $this->success('success', null, $data);
+    }
+
+    /**
      * 添加（若存在验证场景，则自动对应 add 场景）
      */
     public function add()
@@ -122,45 +161,6 @@ trait Curd
         } else {
             $this->success("获取成功", null, $data);
         }
-    }
-
-    /**
-     * 获取首页列表数据
-     * PS：可以在 defore index 方法中动态设置查询参数 $this->indexConfig
-     */
-    public function index()
-    {
-        $config = [
-            'isPage' => true,
-            'page' => $this->request->param('page/d', 1),
-            'page_size' => $this->request->param('page/d', 15),
-            'where' => null,
-            'field' => true,
-            'order' => null
-        ];
-
-        if (isset($this->indexConfig)) {
-            $config = array_merge($config, $this->indexConfig);
-        }
-
-        $model = $this->getModel();
-        if ($config['isPage']) {
-            $list = $model->field($config['field'])
-                ->where($config['where'])
-                ->order($config['order'])
-                ->page($config['page'], $config['page_size'])
-                ->select();
-            $data['page'] = $config['page'];
-            $data['page_size'] = $config['page_size'];
-            $data['list'] = $list;
-        } else {
-            $data = $model->field($config['field'])
-                ->where($config['where'])
-                ->order($config['order'])
-                ->select();
-        }
-
-        $this->success('success', null, $data);
     }
 
     /**

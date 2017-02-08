@@ -16,6 +16,6 @@ class IndexController extends AuthController
 
     public function index()
     {
-        $this->success('test');
+        $this->success('首页');
     }
 }
