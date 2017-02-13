@@ -50,24 +50,40 @@ class AdminRole extends BaseModel
         }
     }
 
-    /**
-     * 从二维数组中取出自己要的KEY值
-     * @param  array $arrData
-     * @param string $key
-     * @param $im true 返回逗号分隔
-     * @return array
-     */
-    function filter_value($arrData, $key, $im = false)
+    public function accessNodeList($roleId)
     {
-        $re = [];
-        foreach ($arrData as $k => $v) {
-            if (isset($v[$key])) $re[] = $v[$key];
-        }
-        if (!empty($re)) {
-            $re = array_flip(array_flip($re));
-            sort($re);
+        // 所有可用的授权节点
+        $list = Db::name('admin_node')
+            ->where(['is_delete' => 0, 'status' => 1])
+            ->order('pid,level,sort')
+            ->select();
+
+        // 已授权列表
+        $accessNodeList = Db::name('admin_access')
+            ->where(['role_id' => $roleId])
+            ->field('node_id')
+            ->distinct(true)
+            ->select();
+        $accessNodeList = array_column($accessNodeList, 'node_id');
+
+        // 匹配
+        foreach ($list as $i => $node) {
+            $list[$i]['is_access'] = in_array($node['id'], $accessNodeList);
         }
 
-        return $im ? implode(',', $re) : $re;
+        return list_to_tree($list);
+    }
+
+    public function saveAccessNodeList($roleId, $data = null)
+    {
+        // 先删除旧数据
+        Db::name('admin_access')->where(['role_id' => $roleId])->delete();
+
+        // 插入新数据
+        if ($data) {
+            return Db::name('admin_access')->insertAll($data);
+        } else {
+            return true;
+        }
     }
 }

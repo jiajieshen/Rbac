@@ -13,7 +13,6 @@ use think\Db;
 
 class AdminNode extends BaseModel
 {
-
     /**
      * 根据用户 id 获取菜单列表
      * @param int $uid
@@ -85,4 +84,5 @@ class AdminNode extends BaseModel
             ])
             ->select();
     }
+
 }

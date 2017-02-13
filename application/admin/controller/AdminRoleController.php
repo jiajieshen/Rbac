@@ -59,14 +59,44 @@ class AdminRoleController extends AdminController
     }
 
 
-    public function access()
+    public function accessList()
     {
         $id = $this->request->param('id/d');
         if (!$id) {
             $this->error('缺少 id 参数');
         }
-        $uids = $this->request->param('uid');
 
+        $AdminRole = new AdminRole();
+        $nodes = $AdminRole->accessNodeList($id);
 
+        $this->success('获取成功', null, $nodes);
+    }
+
+    public function saveAccessList()
+    {
+        $id = $this->request->param('id');
+        if (!$id) {
+            $this->error('缺少 id 参数');
+        }
+        $nodeIds = $this->request->param('node_id');
+
+        $data = [];
+        if ($nodeIds) {
+            $nodeIds = explode(',', $nodeIds);
+            foreach ($nodeIds as $i => $nodeId) {
+                if ($nodeId) {
+                    $data[$i]['role_id'] = $id;
+                    $data[$i]['node_id'] = $nodeId;
+                }
+            }
+        }
+
+        $AdminRole = new AdminRole();
+        $result = $AdminRole->saveAccessNodeList($id, $data);
+        if ($result) {
+            $this->success('保存成功');
+        } else {
+            $this->error('保存失败');
+        }
     }
 }

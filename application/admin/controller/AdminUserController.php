@@ -20,6 +20,7 @@ class AdminUserController extends AdminController
         $startTime = strtotime($this->request->param('start_time'));
         $endTime = strtotime($this->request->param('end_time'));
 
+        $where = [];
         // 昵称关键字
         if ($key) {
             $where['name'] = ['like', '%name%'];
